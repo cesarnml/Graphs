@@ -118,6 +118,34 @@ class Graph:
         visited = set()
         self.recursive_helper(starting_vertex_id, visited)
 
+    def bfs(self, start, goal):
+        # Initialized visited set and array of paths
+        visited = set()
+        paths = [[start]]
+
+        if start == goal:
+            # If start = goal, return trivial path
+            return paths[0]
+        # Else depth-first-search all possible paths
+        while paths:
+            path = paths.pop(0)
+            node = path[-1]
+            # For latest node in current path
+            if node not in visited:
+                # If node not visited, iterate through neighbors
+                # Appending each neighbor as next step in path
+                neighbors = self.vertices[node]
+                for neighbor in neighbors:
+                    new_path = list(path)
+                    new_path.append(neighbor)
+                    paths.append(new_path)
+                    # if neighbor is goal, return new_path
+                    if neighbor == goal:
+                        return new_path
+                visited.add(node)
+        # Visited all paths; no connecting route
+        return 'No connecting path exist'
+
 
 # TESTING
 graph = Graph()  # Instantiate your graph
@@ -127,5 +155,6 @@ graph.add_vertex('2')
 graph.add_vertex('3')
 graph.add_edge('0', '1')
 graph.add_edge('0', '3')
-print(graph.vertices)
-graph.recursive_bft('0')
+# print(graph.vertices)
+# graph.recursive_bft('3')
+print(graph.bfs('0', '3'))
