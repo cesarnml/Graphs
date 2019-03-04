@@ -146,15 +146,25 @@ class Graph:
         # Visited all paths; no connecting route
         return 'No connecting path exist'
 
+    def dfs(self, start, goal):
+        # Analogues to bfs but paths are now accessed using FILO order
+        visited = set()
+        paths = [[start]]
+        if start == goal:
+            return paths[0]
+        while paths:
+            path = paths.pop()
+            node = path[-1]
+            if node not in visited:
+                neighbors = self.vertices[node]
+                for neighbor in neighbors:
+                    new_path = list(path)
+                    new_path.append(neighbor)
+                    paths.append(new_path)
+                    if neighbor == goal:
+                        return new_path
+                    visited.add(node)
+        return 'no connecting path exist'
+
 
 # TESTING
-graph = Graph()  # Instantiate your graph
-graph.add_vertex('0')
-graph.add_vertex('1')
-graph.add_vertex('2')
-graph.add_vertex('3')
-graph.add_edge('0', '1')
-graph.add_edge('0', '3')
-# print(graph.vertices)
-# graph.recursive_bft('3')
-print(graph.bfs('0', '3'))
