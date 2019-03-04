@@ -100,3 +100,32 @@ class Graph:
                 # Then, put all of it's children into the stack
                 for neighbor in self.vertices[v]:
                     s.push(neighbor)
+
+    def recursive_helper(self, vertex_id, visited):
+        # Create a recursive_helper that adds current
+        # vertex_id to visited set and prints vertex_id
+        # Then for all vertex neighbors that have not been visited
+        # Recursively call the recursive_helper
+        visited.add(vertex_id)
+        print(vertex_id)
+
+        for v in self.vertices[vertex_id]:
+            if v not in visited:
+                self.recursive_helper(v, visited)
+
+    def recursive_bft(self, starting_vertex_id):
+        # Initiate visited set and call recursive helper on starting_vertex_id
+        visited = set()
+        self.recursive_helper(starting_vertex_id, visited)
+
+
+# TESTING
+graph = Graph()  # Instantiate your graph
+graph.add_vertex('0')
+graph.add_vertex('1')
+graph.add_vertex('2')
+graph.add_vertex('3')
+graph.add_edge('0', '1')
+graph.add_edge('0', '3')
+print(graph.vertices)
+graph.recursive_bft('0')
