@@ -92,7 +92,7 @@ class Graph:
         while s.size() > 0:
             # Pop the top node from the stack
             v = s.pop()
-            # If that node has not been visted...
+            # If that node has not been visited...
             if v not in visited:
                 # Mark it as visited
                 print(v)
