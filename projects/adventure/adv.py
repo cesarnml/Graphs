@@ -2,6 +2,7 @@ from room import Room
 from player import Player
 from world import World
 
+from collections import deque
 import random
 
 # Load world
@@ -19,22 +20,112 @@ world.loadGraph(roomGraph)
 player = Player("Name", world.startingRoom)
 
 # FILL THIS IN
+# Initialize TraversalList and Adjacency Dictionary and Visited Set
 traversalPath = []
+graph = {}
+visited = set()
+counter = 0
+
+# Helper functions
+
+
+def bfs(start):
+    # Initialized visited set and array of paths
+    visited = set()
+    paths = [[start]]
+
+    # Else breath-first-search all possible paths
+    while paths:
+        path = paths.pop(0)
+        node = path[-1]
+        # For latest node in current path
+        if "?" in list(graph[node].values()):
+            new_path = list(path)
+            new_path.append(node)
+            return new_path
+        if node not in visited:
+            visited.add(node)
+            for key, value in graph[node].items():
+                new_path = list(path)
+                new_path.append(node)
+                paths.append(new_path)
+    return None
+
+
+def addRoomToGraph():
+    # Adds new room to graph and initializes all available exits to ?
+    exits = player.currentRoom.getExits()
+    if player.currentRoom.id in graph:
+        return
+    else:
+        graph[player.currentRoom.id] = {}
+        for move in exits:
+            graph[player.currentRoom.id].update({move: "?"})
+
+
+def updateRooms(prevRoom, newRoom, direction):
+    # Updates room exit info after player move
+    graph[prevRoom].update({direction: newRoom})
+    if direction == "n":
+        graph[newRoom].update({"s": prevRoom})
+    if direction == "s":
+        graph[newRoom].update({"n": prevRoom})
+    if direction == "e":
+        graph[newRoom].update({"w": prevRoom})
+    if direction == "w":
+        graph[newRoom].update({"e": prevRoom})
+
+while len(visited) < len(roomGraph) and counter < 2000:
+    # counter is to avoid infinite loop during development
+    counter += 1
+    # add initial room to visited set
+    visited.add(player.currentRoom.id)
+    # add initial room to graph dictionary
+    addRoomToGraph()
+    print(graph)
+    for move in graph[player.currentRoom.id]:
+        if graph[player.currentRoom.id][move] == '?':
+            traversalPath.append(move)
+            last_room = player.currentRoom
+            player.travel(move)
+            visited.add(player.currentRoom.id)
+            addRoomToGraph()
+            updateRooms(last_room.id, player.currentRoom.id, move)
+            last_room = player.currentRoom
+            print(graph)
+            break
+        if "?" not in list(graph[player.currentRoom.id].values()):
+            for k, v in graph.items():
+                    if "?" in v.values():
+                        path = bfs(player.currentRoom.id)
+                        print(path)
+                        for i in path:
+                            for k, v in graph[player.currentRoom.id].items():
+                                if v == i:
+                                    traversalPath.append(k)
+                                    player.travel(k)
+                                    visited.add(player.currentRoom.id)
+                                    addRoomToGraph(player.currentRoom)
+                                    updateRooms(last_room.id, player.currentRoom.id, k)
+                                    last_room = player.currentRoom
+                                    if "?" in list(graph[player.currentRoom.id].values()):
+                                        break
+
 
 
 # TRAVERSAL TEST
-visited_rooms = set()
-player.currentRoom = world.startingRoom
-visited_rooms.add(player.currentRoom)
-for move in traversalPath:
-    player.travel(move)
-    visited_rooms.add(player.currentRoom)
+# visited_rooms = set()
+# player.currentRoom = world.startingRoom
+# visited_rooms.add(player.currentRoom)
+# for move in traversalPath:
+#     player.travel(move)
+#     visited_rooms.add(player.currentRoom)
 
-if len(visited_rooms) == len(roomGraph):
-    print(f"TESTS PASSED: {len(traversalPath)} moves, {len(visited_rooms)} rooms visited")
-else:
-    print("TESTS FAILED: INCOMPLETE TRAVERSAL")
-    print(f"{len(roomGraph) - len(visited_rooms)} unvisited rooms")
+# if len(visited_rooms) == len(roomGraph):
+#     print(f"TESTS PASSED: {len(traversalPath)} moves, {len(visited_rooms)} rooms visited")
+# else:
+#     print("TESTS FAILED: INCOMPLETE TRAVERSAL")
+#     print(f"{len(roomGraph) - len(visited_rooms)} unvisited rooms")
 
 
 
@@ -49,4 +140,3 @@ else:
 #     else:
 #         print("I did not understand that command.")
 
-world.printRooms()
