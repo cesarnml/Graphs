@@ -62,25 +62,15 @@ def bfs(start):
                     q.enqueue(new_path)
         return None
 
+
 def backtracker(room_list):
-    current_room = room_list[0]
+    # Converts backtrack_room_list to backtrack_steps
     backtrack_steps = []
-    for room in room_list[1:]:
-        for exit in graph[current_room]:
-            if room == graph[current_room][exit]:
+    for i in range(len(room_list) - 1):
+        for exit in graph[room_list[i]]:
+            if room_list[i+1] == graph[room_list[i]][exit]:
                 backtrack_steps.append(exit)
     return backtrack_steps
-
-def reverse(direction):
-    # reverse input direction. Used when backtracking.
-    if direction is 'n':
-        return 's'
-    elif direction is 's':
-        return 'n'
-    elif direction is 'e':
-        return 'w'
-    elif direction is 'w':
-        return 'e'
 
 
 def addRoomToGraph():
@@ -97,7 +87,8 @@ def addRoomToGraph():
 
 
 def updateRooms(prevRoom, newRoom, direction):
-    # Updates prevRoom and newRoom exit values after player moves through unexplored exit
+    # Updates prevRoom and newRoom exit values
+    # after player moves through unexplored exit
     graph[prevRoom].update({direction: newRoom})
     if direction == "n":
         graph[newRoom].update({"s": prevRoom})
@@ -113,27 +104,38 @@ while len(visited) < len(roomGraph):
     visited.add(player.currentRoom.id)
     # add initial room to graph dictionary
     addRoomToGraph()
-    # I should make this random, but for loop works too while developing
+    # For all available exits in current room ....
     for move in graph[player.currentRoom.id]:
-        # Execute move if exit is unexplored
+        # Execute move, if exit is unexplored
         if graph[player.currentRoom.id][move] == '?':
+            # Add move to traversal log
             traversalPath.append(move)
+            # Save current room
             last_room = player.currentRoom
+            # Move player through unexplored exit
             player.travel(move)
+            # Add room to visited set (if duplicate; no change)
             visited.add(player.currentRoom.id)
+            # Add room to graph if new room
             addRoomToGraph()
+            # Update exit/entrance room values
             updateRooms(last_room.id, player.currentRoom.id, move)
             break
+        # If next room is fully explored ...
         if "?" not in list(graph[player.currentRoom.id].values()):
-            room_bfs = bfs(player.currentRoom.id)
-            backtrack_list = backtracker(room_bfs)
-            for move in backtrack_list:
+            # Execute BFS to find bfs_path: [47, 0]
+            bfs_path = bfs(player.currentRoom.id)
+            # Translate bfs_path => backtrack_path => ['s']
+            backtrack_path = backtracker(bfs_path)
+            #**** UNCOMMENT PRINT TO SEE BFS IN ACTION ****#
+            # print('BFS_path: ', bfs_path)
+            # print('Graph: ', graph)
+            # print('Backtrack: ', backtrack_path)
+            # input('hit enter')
+            for move in backtrack_path:
+                # implement and log backtrack_path one move at a time
                 traversalPath.append(move)
                 player.travel(move)
-            # print(backtracker(room_bfs))
-            # print(graph)
-            # print(traversalPath)
-            # input('hit enter')
             break
         # WORKS BUT NOT EFFICIENT
         # if "?" not in list(graph[player.currentRoom.id].values()):
