@@ -103,6 +103,7 @@ def updateRooms(prevRoom, newRoom, direction):
     if direction == "w":
         graph[newRoom].update({"e": prevRoom})
 
+# MAIN TRAVERSAL LOGIC
 while len(visited) < len(roomGraph):
     # add initial room to visited set
     # input('back at top')
