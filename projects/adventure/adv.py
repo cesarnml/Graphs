@@ -28,6 +28,7 @@ visited = set()
 
 
 def reverse(direction):
+    # reverse input direction. Used when backtracking.
     if direction is 'n':
         return 's'
     elif direction is 's':
@@ -42,17 +43,17 @@ def addRoomToGraph():
     # Adds new room to graph and initializes all available room exits to ?
     exits = player.currentRoom.getExits()
     if player.currentRoom.id in graph:
-        # roomID already in graph => return
+        # roomID already in graph => do nothing => return
         return
     else:
-        # roomID not in graph => add it => initialize exits to ?
+        # roomID not in graph => add it => initialize available exits to ?
         graph[player.currentRoom.id] = {}
         for exit in exits:
             graph[player.currentRoom.id].update({exit: "?"})
 
 
 def updateRooms(prevRoom, newRoom, direction):
-    # Updates prevRoom and newRoom exit values after player moves through unexploredExit
+    # Updates prevRoom and newRoom exit values after player moves through unexplored exit
     graph[prevRoom].update({direction: newRoom})
     if direction == "n":
         graph[newRoom].update({"s": prevRoom})
@@ -70,22 +71,23 @@ while len(visited) < len(roomGraph):
     addRoomToGraph()
     # I should make this random, but for loop works too while developing
     for move in graph[player.currentRoom.id]:
+        # Execute move if exit is unexplored
         if graph[player.currentRoom.id][move] == '?':
             traversalPath.append(move)
             last_room = player.currentRoom
-            player.travel(move) 
+            player.travel(move)
             visited.add(player.currentRoom.id)
             addRoomToGraph()
             updateRooms(last_room.id, player.currentRoom.id, move)
             break
         if "?" not in list(graph[player.currentRoom.id].values()):
-            steps_back = 1
+            steps_back = 0
             # Save a copy of traversalPath, which we will use to find nearest ?
             copy_path = traversalPath.copy()
             while "?" not in list(graph[player.currentRoom.id].values()):
-                last_step = copy_path[-steps_back]
                 steps_back += 1
-                rev_step = reverse(last_step)
+                prev_step = copy_path[-steps_back]
+                rev_step = reverse(prev_step)
                 traversalPath.append(rev_step)
                 player.travel(rev_step)
             break
