@@ -111,15 +111,13 @@ while len(visited) < len(roomGraph):
     addRoomToGraph()
     # For all available exits in current room ....
     unexplored_exits = []
-    # print(player.currentRoom.id)
     for move in graph[player.currentRoom.id]:
         # Execute move, if exit is unexplored
         if graph[player.currentRoom.id][move] == '?':
             unexplored_exits.append(move)
-    # print(unexplored_exits)
+    # Randomly select an unexplored exit
     for move in unexplored_exits:
         random_move = random.choice(unexplored_exits)
-        # print(random_move)
         # Add move to traversal log
         traversalPath.append(random_move)
         # Save current room
@@ -139,6 +137,8 @@ while len(visited) < len(roomGraph):
     if "?" not in list(graph[player.currentRoom.id].values()):
         # Execute BFS to find bfs_path: [47, 0]
         bfs_path = bfs(player.currentRoom.id)
+        # IF bfs fails to find another unexplored exit
+        # All rooms have been searched
         if bfs_path is None:
             break
         # Translate bfs_path => backtrack_path => ['s']
