@@ -27,6 +27,50 @@ visited = set()
 # Helper functions
 
 
+class Queue():
+    def __init__(self):
+        self.queue = []
+
+    def enqueue(self, value):
+        self.queue.append(value)
+
+    def dequeue(self):
+        if self.size() > 0:
+            return self.queue.pop(0)
+        else:
+            return None
+
+    def size(self):
+        return len(self.queue)
+
+
+def bfs(start):
+        q = Queue()
+        q.enqueue([start])
+        visited = set()
+        while q.size() > 0:
+            path = q.dequeue()
+            vertex = path[-1]
+            if "?" in list(graph[vertex].values()):
+                new_path = list(path)
+                return new_path
+            if vertex not in visited:
+                visited.add(vertex)
+                for k, v in graph[vertex].items():
+                    new_path = list(path)
+                    new_path.append(v)
+                    q.enqueue(new_path)
+        return None
+
+def backtracker(room_list):
+    current_room = room_list[0]
+    backtrack_steps = []
+    for room in room_list[1:]:
+        for exit in graph[current_room]:
+            if room == graph[current_room][exit]:
+                backtrack_steps.append(exit)
+    return backtrack_steps
+
 def reverse(direction):
     # reverse input direction. Used when backtracking.
     if direction is 'n':
@@ -81,16 +125,28 @@ while len(visited) < len(roomGraph):
             updateRooms(last_room.id, player.currentRoom.id, move)
             break
         if "?" not in list(graph[player.currentRoom.id].values()):
-            steps_back = 0
-            # Save a copy of traversalPath, which we will use to find nearest ?
-            copy_path = traversalPath.copy()
-            while "?" not in list(graph[player.currentRoom.id].values()):
-                steps_back += 1
-                prev_step = copy_path[-steps_back]
-                rev_step = reverse(prev_step)
-                traversalPath.append(rev_step)
-                player.travel(rev_step)
+            room_bfs = bfs(player.currentRoom.id)
+            backtrack_list = backtracker(room_bfs)
+            for move in backtrack_list:
+                traversalPath.append(move)
+                player.travel(move)
+            # print(backtracker(room_bfs))
+            # print(graph)
+            # print(traversalPath)
+            # input('hit enter')
             break
+        # WORKS BUT NOT EFFICIENT
+        # if "?" not in list(graph[player.currentRoom.id].values()):
+        #     steps_back = 0
+        #     # Save a copy of traversalPath, which we will use to find nearest ?
+        #     copy_path = traversalPath.copy()
+        #     while "?" not in list(graph[player.currentRoom.id].values()):
+        #         steps_back += 1
+        #         prev_step = copy_path[-steps_back]
+        #         rev_step = reverse(prev_step)
+        #         traversalPath.append(rev_step)
+        #         player.travel(rev_step)
+        #     break
 
 
 # TRAVERSAL TEST
