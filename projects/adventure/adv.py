@@ -51,14 +51,17 @@ def bfs(start):
         while q.size() > 0:
             path = q.dequeue()
             vertex = path[-1]
+            # If vertex with unexplored exit found, return path to vertex
             if "?" in list(graph[vertex].values()):
-                new_path = list(path)
-                return new_path
+                return path
+            # Otherwise, if vertex not yet visited
             if vertex not in visited:
+                # Add vertex to visited set
                 visited.add(vertex)
                 for k, v in graph[vertex].items():
                     new_path = list(path)
                     new_path.append(v)
+                    # Append explored exit room values to queue
                     q.enqueue(new_path)
         return None
 
@@ -67,9 +70,9 @@ def backtracker(room_list):
     # Converts backtrack_room_list to backtrack_steps
     backtrack_steps = []
     for i in range(len(room_list) - 1):
-        for exit in graph[room_list[i]]:
-            if room_list[i+1] == graph[room_list[i]][exit]:
-                backtrack_steps.append(exit)
+        for e in graph[room_list[i]]:
+            if room_list[i+1] == graph[room_list[i]][e]:
+                backtrack_steps.append(e)
     return backtrack_steps
 
 
@@ -82,8 +85,8 @@ def addRoomToGraph():
     else:
         # roomID not in graph => add it => initialize available exits to ?
         graph[player.currentRoom.id] = {}
-        for exit in exits:
-            graph[player.currentRoom.id].update({exit: "?"})
+        for e in exits:
+            graph[player.currentRoom.id].update({e: "?"})
 
 
 def updateRooms(prevRoom, newRoom, direction):
