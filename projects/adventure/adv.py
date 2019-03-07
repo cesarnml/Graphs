@@ -39,18 +39,20 @@ def reverse(direction):
 
 
 def addRoomToGraph():
-    # Adds new room to graph and initializes all available exits to ?
+    # Adds new room to graph and initializes all available room exits to ?
     exits = player.currentRoom.getExits()
     if player.currentRoom.id in graph:
+        # roomID already in graph => return
         return
     else:
+        # roomID not in graph => add it => initialize exits to ?
         graph[player.currentRoom.id] = {}
-        for move in exits:
-            graph[player.currentRoom.id].update({move: "?"})
+        for exit in exits:
+            graph[player.currentRoom.id].update({exit: "?"})
 
 
 def updateRooms(prevRoom, newRoom, direction):
-    # Updates room exit info after player move
+    # Updates prevRoom and newRoom exit values after player moves through unexploredExit
     graph[prevRoom].update({direction: newRoom})
     if direction == "n":
         graph[newRoom].update({"s": prevRoom})
@@ -71,12 +73,11 @@ while len(visited) < len(roomGraph):
         if graph[player.currentRoom.id][move] == '?':
             traversalPath.append(move)
             last_room = player.currentRoom
-            player.travel(move)
+            player.travel(move) 
             visited.add(player.currentRoom.id)
             addRoomToGraph()
             updateRooms(last_room.id, player.currentRoom.id, move)
             break
-
         if "?" not in list(graph[player.currentRoom.id].values()):
             steps_back = 1
             # Save a copy of traversalPath, which we will use to find nearest ?
@@ -87,6 +88,7 @@ while len(visited) < len(roomGraph):
                 rev_step = reverse(last_step)
                 traversalPath.append(rev_step)
                 player.travel(rev_step)
+            break
 
 
 # TRAVERSAL TEST
