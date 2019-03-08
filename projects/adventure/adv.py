@@ -117,7 +117,7 @@ while len(visited) < len(roomGraph):
         if graph[player.currentRoom.id][move] == '?':
             unexplored_exits.append(move)
     # Randomly select an unexplored exit
-    for move in unexplored_exits:
+    if len(unexplored_exits) > 0:
         random_move = random.choice(unexplored_exits)
         # Add move to traversal log
         traversalPath.append(random_move)
@@ -133,7 +133,6 @@ while len(visited) < len(roomGraph):
         updateRooms(last_room.id, player.currentRoom.id, random_move)
         # print(graph)
         # input('hit enter now')
-        break
         # If next room is fully explored ...
     if "?" not in list(graph[player.currentRoom.id].values()):
         # Execute BFS to find bfs_path: [47, 0]
